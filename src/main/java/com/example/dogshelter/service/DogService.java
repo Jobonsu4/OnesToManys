@@ -1,4 +1,4 @@
-package main.java.com.example.dogshelter.service;
+package com.example.dogshelter.service;
 
 public class DogService {
     
