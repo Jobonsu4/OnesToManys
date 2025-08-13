@@ -31,7 +31,7 @@ public class Dog {
 
     public Dog() {}
 
-    public Dog(String name, String breed, Integer age, String gender, String description, DogShelter shelter) {
+    public Dog(String name, String breed, Integer age, String gender, String description, Dogshelter shelter) {
         this.name = name;
         this.breed = breed;
         this.age = age;
