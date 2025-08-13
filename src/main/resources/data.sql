@@ -11,4 +11,6 @@ INSERT INTO dog (name, breed, age, gender, description, shelter_id) VALUES
 ('Max', 'German Shepherd', 4, 'Male', 'Loyal and protective', 2),
 ('Bella', 'Labrador', 1, 'Female', 'Very playful and loving', 2),
 ('Charlie', 'Poodle', 5, 'Male', 'Calm and well-behaved', 3),
-('Daisy', 'Bulldog', 3, 'Female', 'Gentle and affectionate', 3);
+('Daisy', 'Bulldog', 3, 'Female', 'Gentle and affectionate', 3),
+('Pucci', 'Rottweiler', 6, 'Female', 'Strong and friendly', 1),
+
