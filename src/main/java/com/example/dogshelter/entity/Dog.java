@@ -1,14 +1,21 @@
 package com.example.dogshelter.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "dogs")
+@Table(name = "dog")
+// Jackson will use the "id" property to handle circular references
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 public class Dog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // Primary key
 
     @Column(nullable = false, length = 100)
     private String name;
@@ -19,24 +26,28 @@ public class Dog {
     @Column(length = 10)
     private String gender;
 
-    @Column(name = "age_years")
-    private int ageYears;
+    @Column(name = "age")
+    private int age;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shelter_id", nullable = false)
-    private Dogshelter shelter;
+    @Column(length = 255)
+    private String description;
+
+    @ManyToOne() // Many dogs belong to one shelter
+    @JoinColumn(name = "shelter_id", nullable = false) // Foreign key to Dogshelter table
+    private Dogshelter shelter; // Reference to associated shelter
 
     public Dog() {}
 
-    public Dog(String name, String breed, String gender, int ageYears, Dogshelter shelter) {
+    public Dog(String name, String breed, String gender, int age, String description, Dogshelter shelter) {
         this.name = name;
         this.breed = breed;
         this.gender = gender;
-        this.ageYears = ageYears;
+        this.age = age;
+        this.description = description;
         this.shelter = shelter;
     }
 
-    // Getters & Setters
+    // ----- Getters & Setters -----
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -49,8 +60,11 @@ public class Dog {
     public String getGender() { return gender; }
     public void setGender(String gender) { this.gender = gender; }
 
-    public int getAgeYears() { return ageYears; }
-    public void setAgeYears(int ageYears) { this.ageYears = ageYears; }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
     public Dogshelter getShelter() { return shelter; }
     public void setShelter(Dogshelter shelter) { this.shelter = shelter; }
