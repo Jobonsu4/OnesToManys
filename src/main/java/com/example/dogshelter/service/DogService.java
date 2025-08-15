@@ -16,22 +16,18 @@ public class DogService {
         this.dogRepository = dogRepository;
     }
 
-    // Get all dogs
     public List<Dog> getAllDogs() {
         return dogRepository.findAll();
     }
 
-    // Get dog by id
     public Optional<Dog> getDogById(Long id) {
         return dogRepository.findById(id);
     }
 
-    // Save a dog
     public Dog saveDog(Dog dog) {
         return dogRepository.save(dog);
     }
 
-    // Delete a dog by id
     public void deleteDog(Long id) {
         dogRepository.deleteById(id);
     }

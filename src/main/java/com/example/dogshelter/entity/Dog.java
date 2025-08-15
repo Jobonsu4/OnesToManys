@@ -3,44 +3,40 @@ package com.example.dogshelter.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "dog")
+@Table(name = "dogs")
 public class Dog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // Primary key
+    private Long id;
 
-    @Column(nullable = false)
-    private String name;  // Dog name
+    @Column(nullable = false, length = 100)
+    private String name;
 
-    @Column(length = 100)
-    private String breed;  // Dog breed
-
-    private Integer age;  // Dog age
+    @Column(length = 50)
+    private String breed;
 
     @Column(length = 10)
-    private String gender;  // Dog gender
+    private String gender;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;  // Dog description
+    @Column(name = "age_years")
+    private int ageYears;
 
-    // Many dogs belong to one shelter
-    @ManyToOne
-    @JoinColumn(name = "shelter_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shelter_id", nullable = false)
     private Dogshelter shelter;
 
     public Dog() {}
 
-    public Dog(String name, String breed, Integer age, String gender, String description, Dogshelter shelter) {
+    public Dog(String name, String breed, String gender, int ageYears, Dogshelter shelter) {
         this.name = name;
         this.breed = breed;
-        this.age = age;
         this.gender = gender;
-        this.description = description;
+        this.ageYears = ageYears;
         this.shelter = shelter;
     }
 
-    // Getters and setters
+    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -50,14 +46,11 @@ public class Dog {
     public String getBreed() { return breed; }
     public void setBreed(String breed) { this.breed = breed; }
 
-    public Integer getAge() { return age; }
-    public void setAge(Integer age) { this.age = age; }
-
     public String getGender() { return gender; }
     public void setGender(String gender) { this.gender = gender; }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public int getAgeYears() { return ageYears; }
+    public void setAgeYears(int ageYears) { this.ageYears = ageYears; }
 
     public Dogshelter getShelter() { return shelter; }
     public void setShelter(Dogshelter shelter) { this.shelter = shelter; }

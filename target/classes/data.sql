@@ -1,16 +1,11 @@
--- Insert data into dog_shelter table
-INSERT INTO dog_shelter (name, address, phone_number, email) VALUES
-('Happy Paws Shelter', '123 Main St, Springfield', '555-1234', 'contact@happypaws.com'),
-('Furry Friends Haven', '456 Oak Ave, Shelbyville', '555-5678', 'info@furryfriends.com'),
-('Paws & Claws Rescue', '789 Pine Rd, Capital City', '555-9012', 'support@pawsclaws.org');
+-- Dog Shelters
+INSERT INTO dog_shelter (id, name, location, email, phone_number) VALUES
+(1, 'Happy Tails Shelter', '123 Main St, Cityville', 'info@happytails.com', '555-1234'),
+(2, 'Paws and Friends', '456 Elm St, Townsville', 'contact@pawsfriends.com', '555-5678');
 
--- Insert data into dog table
-INSERT INTO dog (name, breed, age, gender, description, shelter_id) VALUES
-('Buddy', 'Golden Retriever', 3, 'Male', 'Friendly and energetic', 1),
-('Lucy', 'Beagle', 2, 'Female', 'Loves to play fetch', 1),
-('Max', 'German Shepherd', 4, 'Male', 'Loyal and protective', 2),
-('Bella', 'Labrador', 1, 'Female', 'Very playful and loving', 2),
-('Charlie', 'Poodle', 5, 'Male', 'Calm and well-behaved', 3),
-('Daisy', 'Bulldog', 3, 'Female', 'Gentle and affectionate', 3),
-('Pucci', 'Rottweiler', 6, 'Female', 'Strong and friendly', 1),
-
+-- Dogs
+INSERT INTO dog (id, name, breed, age, gender, description, shelter_id) VALUES
+(1, 'Buddy', 'Golden Retriever', 3, 'Male', 'Friendly and playful.', 1),
+(2, 'Luna', 'Labrador', 2, 'Female', 'Loves kids and cuddles.', 1),
+(3, 'Max', 'Beagle', 4, 'Male', 'Energetic and curious.', 2),
+(4, 'Bella', 'German Shepherd', 5, 'Female', 'Loyal and intelligent.', 2);

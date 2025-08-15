@@ -17,13 +17,11 @@ public class DogShelterController {
         this.shelterService = shelterService;
     }
 
-    // Get all shelters
     @GetMapping
     public List<Dogshelter> getAllShelters() {
         return shelterService.getAllShelters();
     }
 
-    // Get shelter by ID
     @GetMapping("/{id}")
     public ResponseEntity<Dogshelter> getShelterById(@PathVariable Long id) {
         return shelterService.getShelterById(id)
@@ -31,13 +29,11 @@ public class DogShelterController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Create a new shelter
     @PostMapping
     public Dogshelter createShelter(@RequestBody Dogshelter shelter) {
         return shelterService.saveShelter(shelter);
     }
 
-    // Delete a shelter
     @DeleteMapping("/{id}")
     public void deleteShelter(@PathVariable Long id) {
         shelterService.deleteShelter(id);

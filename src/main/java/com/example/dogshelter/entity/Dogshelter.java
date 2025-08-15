@@ -1,7 +1,5 @@
 package com.example.dogshelter.entity;
 
-
-
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,22 +10,27 @@ public class Dogshelter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // Primary key
+    private Long id;  
 
-    @Column(nullable = false)
-    private String name;  // Shelter name
+    @Column(nullable = false, length = 100)
+    private String name;  
 
-    @Column(nullable = false)
-    private String location;  // Shelter location
+    @Column(nullable = false, length = 150)
+    private String location;  
 
     @Column(length = 255)
-    private String email;  // Shelter email
+    private String email;  
 
-    @Column(length = 20)
-    private String phoneNumber;  // Shelter phone number
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber;  
 
     // One shelter has many dogs
-    @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+        mappedBy = "shelter",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
     private List<Dog> dogs = new ArrayList<>();
 
     public Dogshelter() {}

@@ -1,0 +1,10 @@
+com/example/dogshelter/entity/Dog.class
+com/example/dogshelter/DogShelterApplication.class
+com/example/dogshelter/service/DogService.class
+com/example/dogshelter/service/ShelterService.class
+com/example/dogshelter/repository/DogShelterRepository.class
+com/example/dogshelter/entity/Dogshelter.class
+com/example/dogshelter/controller/DogShelterController.class
+com/example/dogshelter/controller/HomeController.class
+com/example/dogshelter/controller/DogController.class
+com/example/dogshelter/repository/DogRepository.class

@@ -16,22 +16,18 @@ public class ShelterService {
         this.shelterRepository = shelterRepository;
     }
 
-    // Get all shelters
     public List<Dogshelter> getAllShelters() {
         return shelterRepository.findAll();
     }
 
-    // Get shelter by id
     public Optional<Dogshelter> getShelterById(Long id) {
         return shelterRepository.findById(id);
     }
 
-    // Save a shelter
     public Dogshelter saveShelter(Dogshelter shelter) {
         return shelterRepository.save(shelter);
     }
 
-    // Delete shelter by id
     public void deleteShelter(Long id) {
         shelterRepository.deleteById(id);
     }

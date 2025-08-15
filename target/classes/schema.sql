@@ -1,20 +1,28 @@
--- Dog Shelter table
+-- ================================
+-- SCHEMA: Dog Shelter Management
+-- ================================
+
+-- Drop tables if they already exist (safe for development)
+DROP TABLE IF EXISTS dog;
+DROP TABLE IF EXISTS dog_shelter;
+
+-- Table: dog_shelter
 CREATE TABLE dog_shelter (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    address VARCHAR(255),
-    phone_number VARCHAR(20),
-    email VARCHAR(255)
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    location TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone_number TEXT NOT NULL
 );
 
--- Dog table
+-- Table: dog
 CREATE TABLE dog (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    breed VARCHAR(100),
-    age INT,
-    gender VARCHAR(10),
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    breed TEXT NOT NULL,
+    age INTEGER NOT NULL,
+    gender TEXT NOT NULL,
     description TEXT,
-    shelter_id BIGINT,
-    CONSTRAINT fk_shelter FOREIGN KEY (shelter_id) REFERENCES dog_shelter(id) ON DELETE CASCADE
+    shelter_id INTEGER NOT NULL,
+    FOREIGN KEY (shelter_id) REFERENCES dog_shelter(id) ON DELETE CASCADE
 );

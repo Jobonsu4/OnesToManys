@@ -1,0 +1,10 @@
+/Users/josiah/PROJECTS/OnesToManys/src/main/java/com/example/dogshelter/DogShelterApplication.java
+/Users/josiah/PROJECTS/OnesToManys/src/main/java/com/example/dogshelter/controller/DogController.java
+/Users/josiah/PROJECTS/OnesToManys/src/main/java/com/example/dogshelter/controller/DogShelterController.java
+/Users/josiah/PROJECTS/OnesToManys/src/main/java/com/example/dogshelter/controller/HomeController.java
+/Users/josiah/PROJECTS/OnesToManys/src/main/java/com/example/dogshelter/entity/Dog.java
+/Users/josiah/PROJECTS/OnesToManys/src/main/java/com/example/dogshelter/entity/Dogshelter.java
+/Users/josiah/PROJECTS/OnesToManys/src/main/java/com/example/dogshelter/repository/DogRepository.java
+/Users/josiah/PROJECTS/OnesToManys/src/main/java/com/example/dogshelter/repository/DogShelterRepository.java
+/Users/josiah/PROJECTS/OnesToManys/src/main/java/com/example/dogshelter/service/DogService.java
+/Users/josiah/PROJECTS/OnesToManys/src/main/java/com/example/dogshelter/service/ShelterService.java

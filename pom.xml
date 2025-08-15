@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <name>dog-shelter</name>
-    <description>Dog Shelter Management System with H2 Database</description>
+    <description>Dog Shelter Management System with SQLite Database</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -25,30 +25,30 @@
     </properties>
 
     <dependencies>
-        <!-- Spring Boot Web Starter -->
+        <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Spring Boot Data JPA Starter (includes Jakarta Persistence) -->
+        <!-- Spring Boot JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- Explicit Jakarta Persistence API (optional, ensures imports resolve) -->
+        <!-- Jakarta Persistence API -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <version>3.1.0</version>
         </dependency>
 
-        <!-- H2 Database -->
+        <!-- SQLite JDBC -->
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.46.0.0</version>
         </dependency>
 
         <!-- Bean Validation -->
@@ -57,35 +57,28 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- Testing -->
+        <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-community-dialects</artifactId>
+            <!-- <version>6.5.2.Final</version> -->
+    </dependency>
+    <dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.5.0</version>
+</dependency>
+
+
     </dependencies>
 
     <build>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </resource>
-        </resources>
-
-        <testSourceDirectory>src/test/java</testSourceDirectory>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </testResource>
-        </testResources>
-
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
