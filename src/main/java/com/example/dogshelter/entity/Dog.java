@@ -1,16 +1,10 @@
 package com.example.dogshelter.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "dog")
-// Jackson will use the "id" property to handle circular references
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id"
-)
 public class Dog {
 
     @Id
@@ -32,9 +26,10 @@ public class Dog {
     @Column(length = 255)
     private String description;
 
-    @ManyToOne() // Many dogs belong to one shelter
-    @JoinColumn(name = "shelter_id", nullable = false) // Foreign key to Dogshelter table
-    private Dogshelter shelter; // Reference to associated shelter
+    @ManyToOne
+    @JoinColumn(name = "shelter_id", nullable = false)
+    @JsonBackReference // 👈 Prevents infinite recursion
+    private Dogshelter shelter;
 
     public Dog() {}
 
