@@ -1,6 +1,15 @@
 const contentDiv = document.getElementById("content");
-const sheltersBtn = document.getElementById("viewSheltersBtn");
-const dogsBtn = document.getElementById("viewDogsBtn");
+
+// ✅ Main Menu
+function showMainMenu() {
+    contentDiv.innerHTML = `
+        <h2>Welcome to Dog Shelter Management 🐾</h2>
+        <div class="menu">
+            <button onclick="loadShelters()">View Shelters</button>
+            <button onclick="loadDogs()">View Dogs</button>
+        </div>
+    `;
+}
 
 // ✅ Fetch all shelters
 async function loadShelters() {
@@ -21,6 +30,12 @@ async function loadShelters() {
         `;
         contentDiv.appendChild(shelterCard);
     });
+
+    // Back button
+    const backBtn = document.createElement("button");
+    backBtn.textContent = "⬅ Back to Main Menu";
+    backBtn.onclick = showMainMenu;
+    contentDiv.appendChild(backBtn);
 }
 
 // ✅ Fetch single shelter & show dogs
@@ -41,14 +56,16 @@ async function loadShelterDogs(shelterId) {
 
     if (shelter.dogs && shelter.dogs.length > 0) {
         shelter.dogs.forEach(dog => {
+            const imageUrl = dog.imageUrl || `https://place-puppy.com/200x200?random=${dog.id}`;
             const dogCard = document.createElement("div");
             dogCard.className = "card";
             dogCard.innerHTML = `
                 <h4>${dog.name}</h4>
+                <img src="${imageUrl}" alt="${dog.name}" class="dog-photo">
                 <p><strong>Breed:</strong> ${dog.breed}</p>
                 <p><strong>Age:</strong> ${dog.age}</p>
                 <p><strong>Gender:</strong> ${dog.gender}</p>
-                <p>${dog.description || ""}</p>
+                <button onclick="viewDog(${dog.id}, ${shelter.id})">View Profile</button>
             `;
             dogsListDiv.appendChild(dogCard);
         });
@@ -65,20 +82,70 @@ async function loadDogs() {
     contentDiv.innerHTML = "<h2>All Dogs</h2>";
 
     dogs.forEach(dog => {
+        const imageUrl = dog.imageUrl || `https://place-puppy.com/200x200?random=${dog.id}`;
         const dogCard = document.createElement("div");
         dogCard.className = "card";
         dogCard.innerHTML = `
             <h3>${dog.name}</h3>
+            <img src="${imageUrl}" alt="${dog.name}" class="dog-photo">
+            <p><strong>Breed:</strong> ${dog.breed}</p>
+            <p><strong>Age:</strong> ${dog.age}</p>
+            <p><strong>Gender:</strong> ${dog.gender}</p>
+            <p><em>Shelter:</em> ${dog.shelter ? dog.shelter.name : "Unknown"}</p>
+            <button onclick="viewDog(${dog.id}, ${dog.shelter ? dog.shelter.id : null})">View Profile</button>
+        `;
+        contentDiv.appendChild(dogCard);
+    });
+
+    // Back button
+    const backBtn = document.createElement("button");
+    backBtn.textContent = "⬅ Back to Main Menu";
+    backBtn.onclick = showMainMenu;
+    contentDiv.appendChild(backBtn);
+}
+
+// ✅ Dog Profile Page
+async function viewDog(dogId, shelterId = null) {
+    const res = await fetch(`/api/dog/${dogId}`);
+    const dog = await res.json();
+
+    const imageUrl = dog.imageUrl || `https://place-puppy.com/300x300?random=${dog.id}`;
+
+    contentDiv.innerHTML = `
+        <h2>${dog.name} 🐕</h2>
+        <div class="card dog-profile">
+            <img src="${imageUrl}" alt="${dog.name}" class="dog-photo">
             <p><strong>Breed:</strong> ${dog.breed}</p>
             <p><strong>Age:</strong> ${dog.age}</p>
             <p><strong>Gender:</strong> ${dog.gender}</p>
             <p><strong>Description:</strong> ${dog.description || "N/A"}</p>
-            <p><em>Shelter:</em> ${dog.shelter ? dog.shelter.name : "Unknown"}</p>
-        `;
-        contentDiv.appendChild(dogCard);
-    });
+            <p><strong>Shelter:</strong> ${dog.shelter ? dog.shelter.name : "Unknown"}</p>
+        </div>
+    `;
+
+    // Back buttons
+    const backDiv = document.createElement("div");
+    backDiv.className = "menu";
+
+    if (shelterId) {
+        const backToShelterBtn = document.createElement("button");
+        backToShelterBtn.textContent = "⬅ Back to Shelter";
+        backToShelterBtn.onclick = () => loadShelterDogs(shelterId);
+        backDiv.appendChild(backToShelterBtn);
+    }
+
+    const backToDogsBtn = document.createElement("button");
+    backToDogsBtn.textContent = "⬅ Back to All Dogs";
+    backToDogsBtn.onclick = loadDogs;
+    backDiv.appendChild(backToDogsBtn);
+
+    const backToMenuBtn = document.createElement("button");
+    backToMenuBtn.textContent = "⬅ Back to Main Menu";
+    backToMenuBtn.onclick = showMainMenu;
+    backDiv.appendChild(backToMenuBtn);
+
+    contentDiv.appendChild(backDiv);
 }
 
-// ✅ Hook up buttons
-sheltersBtn.addEventListener("click", loadShelters);
-dogsBtn.addEventListener("click", loadDogs);
+// ✅ Load main menu on startup
+showMainMenu();

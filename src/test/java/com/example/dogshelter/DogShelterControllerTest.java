@@ -2,123 +2,136 @@ package com.example.dogshelter;
 
 import com.example.dogshelter.entity.Dogshelter;
 import com.example.dogshelter.service.ShelterService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Web layer test for {@link DogShelterController}.
+ * Uses {@link WebMvcTest} to test only the web layer, mocking {@link ShelterService}.
+ */
 @WebMvcTest(DogShelterControllerTest.class)
-public class DogShelterControllerTest {
+class DogShelterControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private MockMvc mockMvc; // Mock HTTP client
 
     @MockBean
-    private ShelterService shelterService;
-
-    private Dogshelter shelter1;
-    private Dogshelter shelter2;
-
-    @BeforeEach
-    public void setup() {
-        shelter1 = new Dogshelter("Happy Tails Shelter", "123 Main St", "info@happytails.com", "555-1234");
-        shelter1.setId(1L);
-
-        shelter2 = new Dogshelter("Paws and Friends", "456 Elm St", "contact@pawsfriends.com", "555-5678");
-        shelter2.setId(2L);
-    }
+    private ShelterService shelterService; // Mocked service dependency
 
     @Test
-    public void testGetAllShelters() throws Exception {
-        Mockito.when(shelterService.getAllShelters()).thenReturn(Arrays.asList(shelter1, shelter2));
+    void getAllShelters_ShouldReturnListOfShelters() throws Exception {
+        Dogshelter s1 = new Dogshelter(1L, "Happy Tails", "New York", "happy@example.com", "1234567890");
+        Dogshelter s2 = new Dogshelter(2L, "Paws Home", "Los Angeles", "paws@example.com", "9876543210");
 
-        mockMvc.perform(get("/api/shelters"))
+        when(shelterService.getAllShelters()).thenReturn(Arrays.asList(s1, s2));
+
+        mockMvc.perform(get("/api/shelter"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Happy Tails Shelter"))
-                .andExpect(jsonPath("$[1].name").value("Paws and Friends"));
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name", is("Happy Tails")))
+                .andExpect(jsonPath("$[1].name", is("Paws Home")));
     }
 
     @Test
-    public void testGetShelterById_Found() throws Exception {
-        Mockito.when(shelterService.getShelterById(1L)).thenReturn(Optional.of(shelter1));
+    void getShelterById_WhenExists_ShouldReturnShelter() throws Exception {
+        Dogshelter s1 = new Dogshelter(1L, "Happy Tails", "New York", "happy@example.com", "1234567890");
 
-        mockMvc.perform(get("/api/shelters/1"))
+        when(shelterService.getShelterById(1L)).thenReturn(Optional.of(s1));
+
+        mockMvc.perform(get("/api/shelter/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Happy Tails Shelter"));
+                .andExpect(jsonPath("$.name", is("Happy Tails")))
+                .andExpect(jsonPath("$.location", is("New York")));
     }
 
     @Test
-    public void testGetShelterById_NotFound() throws Exception {
-        Mockito.when(shelterService.getShelterById(10L)).thenReturn(Optional.empty());
+    void getShelterById_WhenNotExists_ShouldReturn404() throws Exception {
+        when(shelterService.getShelterById(99L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/shelters/10"))
+        mockMvc.perform(get("/api/shelter/99"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void testCreateShelter() throws Exception {
-        Mockito.when(shelterService.saveShelter(any(Dogshelter.class))).thenReturn(shelter1);
+    void createShelter_ShouldReturnSavedShelter() throws Exception {
+        Dogshelter saved = new Dogshelter(1L, "Happy Tails", "New York", "happy@example.com", "1234567890");
 
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(shelter1);
+        when(shelterService.saveShelter(any(Dogshelter.class))).thenReturn(saved);
 
-        mockMvc.perform(post("/api/shelters")
+        mockMvc.perform(post("/api/shelter")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+                        .content("""
+                                {
+                                  "name": "Happy Tails",
+                                  "location": "New York",
+                                  "email": "happy@example.com",
+                                  "phoneNumber": "1234567890"
+                                }
+                                """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Happy Tails Shelter"));
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Happy Tails")));
     }
 
     @Test
-    public void testUpdateShelter_Found() throws Exception {
-        Dogshelter updated = new Dogshelter("Updated Shelter", "New Location", "newemail@test.com", "555-9999");
-        updated.setId(1L);
+    void updateShelter_WhenExists_ShouldReturnUpdatedShelter() throws Exception {
+        Dogshelter existing = new Dogshelter(1L, "Happy Tails", "NY", "old@example.com", "1111111111");
+        Dogshelter updated = new Dogshelter(1L, "Happy Tails Updated", "New York", "happy@example.com", "1234567890");
 
-        Mockito.when(shelterService.getShelterById(1L)).thenReturn(Optional.of(shelter1));
-        Mockito.when(shelterService.saveShelter(any(Dogshelter.class))).thenReturn(updated);
+        when(shelterService.getShelterById(1L)).thenReturn(Optional.of(existing));
+        when(shelterService.saveShelter(any(Dogshelter.class))).thenReturn(updated);
 
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(updated);
-
-        mockMvc.perform(put("/api/shelters/1")
+        mockMvc.perform(put("/api/shelter/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+                        .content("""
+                                {
+                                  "name": "Happy Tails Updated",
+                                  "location": "New York",
+                                  "email": "happy@example.com",
+                                  "phoneNumber": "1234567890"
+                                }
+                                """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Updated Shelter"))
-                .andExpect(jsonPath("$.location").value("New Location"));
+                .andExpect(jsonPath("$.name", is("Happy Tails Updated")))
+                .andExpect(jsonPath("$.email", is("happy@example.com")));
     }
 
     @Test
-    public void testUpdateShelter_NotFound() throws Exception {
-        Mockito.when(shelterService.getShelterById(anyLong())).thenReturn(Optional.empty());
+    void updateShelter_WhenNotExists_ShouldReturn404() throws Exception {
+        when(shelterService.getShelterById(99L)).thenReturn(Optional.empty());
 
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(shelter1);
-
-        mockMvc.perform(put("/api/shelters/10")
+        mockMvc.perform(put("/api/shelter/99")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+                        .content("""
+                                {
+                                  "name": "Ghost Shelter",
+                                  "location": "Nowhere",
+                                  "email": "ghost@example.com",
+                                  "phoneNumber": "0000000000"
+                                }
+                                """))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void testDeleteShelter() throws Exception {
-        Mockito.doNothing().when(shelterService).deleteShelter(1L);
+    void deleteShelter_ShouldReturn200() throws Exception {
+        doNothing().when(shelterService).deleteShelter(1L);
 
-        mockMvc.perform(delete("/api/shelters/1"))
+        mockMvc.perform(delete("/api/shelter/1"))
                 .andExpect(status().isOk());
     }
 }

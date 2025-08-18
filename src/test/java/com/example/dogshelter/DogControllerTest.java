@@ -1,11 +1,8 @@
 package com.example.dogshelter;
 
 import com.example.dogshelter.entity.Dog;
-import com.example.dogshelter.entity.Dogshelter;
 import com.example.dogshelter.service.DogService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,115 +12,127 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-@WebMvcTest(DogControllerTest.class) // Load only DogController for testing
-public class DogControllerTest {
+/**
+ * Web layer test for {@link DogController}.
+ * Uses {@link WebMvcTest} to spin up only the web layer and mocks {@link DogService}.
+ */
+@WebMvcTest(DogControllerTest.class)
+class DogControllerTest {
 
     @Autowired
-    private MockMvc mockMvc; // Mock MVC to simulate HTTP requests
+    private MockMvc mockMvc; // Mock HTTP client for simulating requests to controller endpoints
 
     @MockBean
-    private DogService dogService; // Mock service layer
-
-    private Dogshelter shelter;
-    private Dog dog1;
-    private Dog dog2;
-
-    @BeforeEach
-    public void setup() {
-        // Sample shelter for dog association
-        shelter = new Dogshelter("Happy Tails Shelter", "123 Main St", "info@happytails.com", "555-1234");
-        shelter.setId(1L);
-
-        // Sample dogs
-        dog1 = new Dog("Buddy", "Golden Retriever", "Male", 3, "Friendly", shelter);
-        dog1.setId(1L);
-
-        dog2 = new Dog("Luna", "Labrador", "Female", 2, "Cuddly", shelter);
-        dog2.setId(2L);
-    }
+    private DogService dogService; // Mocked service dependency
 
     @Test
-    public void testGetAllDogs() throws Exception {
-        Mockito.when(dogService.getAllDogs()).thenReturn(Arrays.asList(dog1, dog2));
+    void getAllDogs_ShouldReturnListOfDogs() throws Exception {
+        Dog dog1 = new Dog(1L, "Buddy", "Labrador", 3, "Male", "Friendly", null);
+        Dog dog2 = new Dog(2L, "Lucy", "Beagle", 2, "Female", "Playful", null);
+
+        when(dogService.getAllDogs()).thenReturn(Arrays.asList(dog1, dog2));
 
         mockMvc.perform(get("/api/dog"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Buddy"))
-                .andExpect(jsonPath("$[1].name").value("Luna"));
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name", is("Buddy")))
+                .andExpect(jsonPath("$[1].name", is("Lucy")));
     }
 
     @Test
-    public void testGetDogById_Found() throws Exception {
-        Mockito.when(dogService.getDogById(1L)).thenReturn(Optional.of(dog1));
+    void getDogById_WhenDogExists_ShouldReturnDog() throws Exception {
+        Dog dog = new Dog(1L, "Buddy", "Labrador", 3, "Male", "Friendly", null);
+
+        when(dogService.getDogById(1L)).thenReturn(Optional.of(dog));
 
         mockMvc.perform(get("/api/dog/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Buddy"));
+                .andExpect(jsonPath("$.name", is("Buddy")))
+                .andExpect(jsonPath("$.breed", is("Labrador")));
     }
 
     @Test
-    public void testGetDogById_NotFound() throws Exception {
-        Mockito.when(dogService.getDogById(3L)).thenReturn(Optional.empty());
+    void getDogById_WhenDogDoesNotExist_ShouldReturn404() throws Exception {
+        when(dogService.getDogById(99L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/dog/3"))
+        mockMvc.perform(get("/api/dog/99"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void testCreateDog() throws Exception {
-        Mockito.when(dogService.saveDog(any(Dog.class))).thenReturn(dog1);
+    void createDog_ShouldReturnSavedDog() throws Exception {
+        Dog saved = new Dog(1L, "Buddy", "Labrador", 3, "Male", "Friendly", null);
 
-        ObjectMapper mapper = new ObjectMapper();
-        String dogJson = mapper.writeValueAsString(dog1);
+        when(dogService.saveDog(any(Dog.class))).thenReturn(saved);
 
         mockMvc.perform(post("/api/dog")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(dogJson))
+                        .content("""
+                                {
+                                  "name": "Buddy",
+                                  "breed": "Labrador",
+                                  "age": 3,
+                                  "gender": "Male",
+                                  "description": "Friendly"
+                                }
+                                """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Buddy"));
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Buddy")));
     }
 
     @Test
-    public void testUpdateDog_Found() throws Exception {
-        Dog updatedDog = new Dog("Buddy Updated", "Golden Retriever", "Male", 4, "Friendly", shelter);
-        updatedDog.setId(1L);
+    void updateDog_WhenDogExists_ShouldReturnUpdatedDog() throws Exception {
+        Dog existing = new Dog(1L, "Buddy", "Labrador", 3, "Male", "Friendly", null);
+        Dog updated = new Dog(1L, "Max", "Golden Retriever", 4, "Male", "Calm", null);
 
-        Mockito.when(dogService.getDogById(1L)).thenReturn(Optional.of(dog1));
-        Mockito.when(dogService.saveDog(any(Dog.class))).thenReturn(updatedDog);
-
-        ObjectMapper mapper = new ObjectMapper();
-        String dogJson = mapper.writeValueAsString(updatedDog);
+        when(dogService.getDogById(1L)).thenReturn(Optional.of(existing));
+        when(dogService.saveDog(any(Dog.class))).thenReturn(updated);
 
         mockMvc.perform(put("/api/dog/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(dogJson))
+                        .content("""
+                                {
+                                  "name": "Max",
+                                  "breed": "Golden Retriever",
+                                  "age": 4,
+                                  "gender": "Male",
+                                  "description": "Calm"
+                                }
+                                """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Buddy Updated"))
-                .andExpect(jsonPath("$.age").value(4));
+                .andExpect(jsonPath("$.name", is("Max")))
+                .andExpect(jsonPath("$.breed", is("Golden Retriever")));
     }
 
     @Test
-    public void testUpdateDog_NotFound() throws Exception {
-        Mockito.when(dogService.getDogById(anyLong())).thenReturn(Optional.empty());
+    void updateDog_WhenDogDoesNotExist_ShouldReturn404() throws Exception {
+        when(dogService.getDogById(99L)).thenReturn(Optional.empty());
 
-        ObjectMapper mapper = new ObjectMapper();
-        String dogJson = mapper.writeValueAsString(dog1);
-
-        mockMvc.perform(put("/api/dog/10")
+        mockMvc.perform(put("/api/dog/99")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(dogJson))
+                        .content("""
+                                {
+                                  "name": "Ghost",
+                                  "breed": "Unknown",
+                                  "age": 1,
+                                  "gender": "Male",
+                                  "description": "Invisible"
+                                }
+                                """))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void testDeleteDog() throws Exception {
-        Mockito.doNothing().when(dogService).deleteDog(1L);
+    void deleteDog_ShouldReturn200() throws Exception {
+        doNothing().when(dogService).deleteDog(1L);
 
         mockMvc.perform(delete("/api/dog/1"))
                 .andExpect(status().isOk());
