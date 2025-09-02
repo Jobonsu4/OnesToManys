@@ -16,8 +16,8 @@
                 registry.addMapping("/api/**")           // Apply CORS to all API endpoints
                         .allowedOrigins(
                             "http://localhost:5500",    // Vanilla JS dev server
-                            "http://localhost:3000",    // React dev server
-                           "http://localhost:5173"     // Vue.js dev server
+                            "http://localhost:3000",    // Vue.js dev server
+                           "http://localhost:5175"     // React dev server
                                        ).allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                          .allowedHeaders("*")           // Allow all headers
                          .allowCredentials(true);      // If you use cookies/auth

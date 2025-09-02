@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.*; // Import Spring MVC annotatio
 import java.util.List; // Import List to store multiple Dogshelter objects in a response
 
 @RestController // Marks this class as a REST controller (return values are serialized to JSON/XML)
-@RequestMapping("/api/shelter") // Base URI path for all endpoints in this controller; every route will start with /api/shelters
+@RequestMapping("/api/shelter")
+@CrossOrigin(origins = "http://localhost:5175")  // 👈 allow React frontend
 public class DogShelterController { // Begin class definition for DogShelterController
 
     private final ShelterService shelterService; // Declare final reference to ShelterService (for dependency injection)
